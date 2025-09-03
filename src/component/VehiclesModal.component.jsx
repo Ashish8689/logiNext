@@ -1,18 +1,41 @@
-import { Box, Button, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  linearProgressClasses,
+  Modal,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../constant/common.constant";
+import "../modal.css";
+import { formatDateTime, formatLatLng } from "../utils/commom";
+import styled from "@emotion/styled";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 700,
   bgcolor: "background.paper",
-  border: "2px solid #000",
   boxShadow: 24,
-  p: 4,
 };
+
+const BorderLinearProgress = styled(LinearProgress)(() => ({
+  marginTop: "10px",
+  height: 10,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor: "#dee1ec",
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    backgroundColor: "#1a90ff",
+  },
+}));
 
 const VehiclesModal = ({ id, onClose }) => {
   const [vehicle, setVehicle] = useState();
@@ -44,71 +67,86 @@ const VehiclesModal = ({ id, onClose }) => {
     >
       <Box sx={style}>
         {isLoading ? (
-          <h1>Loader.....</h1>
+          <div className="loader">
+  <CircularProgress />
+          </div>
         ) : (
           <>
-          <div className="modal-header">
-            <div> <Typography id="modal-modal-title" variant="h6" component="h2">
-              {vehicle.vehicleNumber}
-              {vehicle.driverName}
-            </Typography>
-           </div>
+            <div className="modal-header">
+              <div className="modal-header-content">
+                {" "}
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  <h1>{vehicle.vehicleNumber}</h1>
+                  <div>
+                    {" "}
+                    <h6>{vehicle.driverName} : <span>{vehicle.status}</span></h6>
+                  </div>
+                </Typography>
+              </div>
 
-            <div>
-              <Button onClick={onClose}>X</Button>
-            </div>
-          </div>
-
-          <div className="modal-content">
-            <div>
-               <h3>Status</h3>
-                <h3>{vehicle.status}</h3>
-            </div>
-
-            <div>
-               <h3>Current Speed</h3>
-                <h3>{vehicle.speed}</h3>
+              <div>
+                <Button onClick={onClose}>X</Button>
+              </div>
             </div>
 
-            <div>
-               <h3>Driver</h3>
-                <h3>{vehicle.driverName}</h3>
-            </div>
+            <Grid container spacing={2} className="modal-content">
+              <Grid size={6} className="modal-item-container">
+                <h3>Status</h3>
+                <p className={`status-badge-container modal-status ${vehicle.status}`}>
+                  {vehicle.status}
+                </p>
+              </Grid>
 
-            <div>
-               <h3>Phone</h3>
-                <h3>{vehicle.driverPhone}</h3>
-            </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Current Speed</h3>
+                <h4>{`${vehicle.speed} mph`}</h4>
+              </Grid>
 
-            <div>
-               <h3>Destination</h3>
-                <h3>{vehicle.destination}</h3>
-            </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Driver</h3>
+                <h4>{vehicle.driverName}</h4>
+              </Grid>
 
-            <div>
-               <h3>Location</h3>
-                <h3>{vehicle.currentLocation.lat}</h3>
-                <h3>{vehicle.currentLocation.lng}</h3>
-            </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Phone</h3>
+                <h4>{vehicle.driverPhone}</h4>
+              </Grid>
 
-            <div>
-               <h3>Battery Level</h3>
-                <h3>{vehicle.batteryLevel}</h3>
-            </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Destination</h3>
+                <h4>{vehicle.destination}</h4>
+              </Grid>
 
-            <div>
-               <h3>Fuel Level</h3>
-                <h3>{vehicle.fuelLevel}</h3>
-            </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Location</h3>
+                <h4>{formatLatLng(vehicle.currentLocation.lat)}</h4>
+                <h4>{formatLatLng(vehicle.currentLocation.lng)}</h4>
+              </Grid>
 
-             <div>
-               <h3>Last Updated</h3>
-                <h3>{vehicle.lastUpdated}</h3>
-            </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Battery Level</h3>
+                <h4>{`${vehicle.batteryLevel}%`}</h4>
+                <BorderLinearProgress
+                  variant="determinate"
+                  value={vehicle.batteryLevel}
+                />
+              </Grid>
 
-          </div>
+              <Grid size={6} className="modal-item-container">
+                <h3>Fuel Level</h3>
+                <h4>{`${vehicle.fuelLevel}%`}</h4>
+                <BorderLinearProgress
+                  variant="determinate"
+                  value={vehicle.fuelLevel}
+                />
+              </Grid>
+
+              <Grid size={6} className="modal-item-container">
+                <h3>Last Updated</h3>
+                <h4>{formatDateTime(vehicle.lastUpdated)}</h4>
+              </Grid>
+            </Grid>
           </>
-          
         )}
       </Box>
     </Modal>

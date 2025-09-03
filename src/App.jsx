@@ -3,6 +3,7 @@ import "./App.css";
 import {
   BASE_URL,
   STATUS_FILTER,
+  TABLE_COLUMNS,
   WEBSOCKET_URL,
 } from "./constant/common.constant";
 import {
@@ -14,6 +15,7 @@ import {
   TableRow,
   Paper,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import VehiclesModal from "./component/VehiclesModal.component";
 import FleetTrackerLeftPanel from "./component/FleetTrackerLeftPanel.component";
@@ -99,7 +101,9 @@ function App() {
       </div>
       <div className="right-container">
         {isLoading ? (
-          <h1>Loader....</h1>
+          <div className="loader">
+  <CircularProgress />
+          </div>
         ) : (
           <>
             <div className="right-header">
@@ -110,14 +114,9 @@ function App() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Vehicle</TableCell>
-                    <TableCell>Driver</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Speed</TableCell>
-                    <TableCell>Destination</TableCell>
-                    <TableCell>ETA</TableCell>
-                    <TableCell>Last Updated</TableCell>
-                    <TableCell>Location</TableCell>
+                    {TABLE_COLUMNS.map((item) => (
+                      <TableCell key={item}>{item}</TableCell>
+                    ))}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -135,13 +134,11 @@ function App() {
                         <p
                           className={`status-badge-container ${vehicle.status}`}
                         >
-                          {" "}
                           {vehicle.status || "-"}
                         </p>
                       </TableCell>
                       <TableCell>
                         <p className="speed-badge-container">
-                          {" "}
                           {`${vehicle.speed ?? 0}mph`}
                         </p>
                       </TableCell>

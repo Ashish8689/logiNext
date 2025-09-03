@@ -9,3 +9,5 @@ export const STATUS_FILTER = {
     EN_ROUTE : 'en_route',
     DELIVERED : 'delivered'
 }
+export const TABLE_COLUMNS = ["Vehicle","Driver","Status","Speed","Destination","ETA","Last Updated","Location"]
+

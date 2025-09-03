@@ -1,13 +1,13 @@
-import { Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { useMemo } from "react";
 import { STATUS_FILTER } from "../constant/common.constant";
 
-const VehiclesStatusFilter = ({ statistics, handleFilter }) => {
+const VehiclesStatusFilter = ({ activeFilter,statistics, handleFilter }) => {
   const { delivered, en_route, idle, total } = statistics;
   const filterOptions = useMemo(
     () => [
       {
-        key: STATUS_FILTER.All,
+        key: STATUS_FILTER.ALL,
         title: "All",
         count: total,
       },
@@ -34,14 +34,19 @@ const VehiclesStatusFilter = ({ statistics, handleFilter }) => {
     <div className="filter-container">
       <h3>Filter by Status</h3>
 
-      {filterOptions.map(({ key, title, count }) => {
-        return (
-          <Button
-            key={key}
-            onClick={() => handleFilter(key)}
-          >{`${title} ${count}`}</Button>
-        );
-      })}
+      <Grid container spacing={2} className="filter-button-container">
+        {filterOptions.map(({ key, title, count }) => {
+          return (
+            <Grid size={6} key={key}>
+              <Button
+                className={`filter-button ${activeFilter === key ? 'active-filer' : ''}`}
+                variant="outlined"
+                onClick={() => handleFilter(key)}
+              >{`${title} (${count})`}</Button>
+            </Grid>
+          );
+        })}
+      </Grid>
     </div>
   );
 };

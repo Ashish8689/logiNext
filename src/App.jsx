@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import "./App.css";
-import { BASE_URL, STATUS_FILTER, WEBSOCKET_URL } from "./constant/common.constant";
+import {
+  BASE_URL,
+  STATUS_FILTER,
+  WEBSOCKET_URL,
+} from "./constant/common.constant";
 import {
   Table,
   TableBody,
@@ -13,6 +17,7 @@ import {
 } from "@mui/material";
 import VehiclesModal from "./component/VehiclesModal.component";
 import FleetTrackerLeftPanel from "./component/FleetTrackerLeftPanel.component";
+import { formatDateTime, formatLatLng } from "./utils/commom";
 
 function App() {
   const [vehicles, setVehicles] = useState([]);
@@ -84,52 +89,79 @@ function App() {
     };
   }, []);
 
-  if (isLoading) {
-    return <h1>Loader....</h1>;
-  }
-
   return (
     <div className="container">
       <div className="left-container">
-        <FleetTrackerLeftPanel handleFilter={onFilterChange} />
+        <FleetTrackerLeftPanel
+          activeFilter={activeFilter}
+          handleFilter={onFilterChange}
+        />
       </div>
       <div className="right-container">
-        <div>
-          <h3>Vehicles {`(${vehicles.length})`}</h3>
-          <Button>Live</Button>
-        </div>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Vehicle</TableCell>
-                <TableCell>Driver</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Speed</TableCell>
-                <TableCell>Destination</TableCell>
-                <TableCell>ETA</TableCell>
-                <TableCell>Last Updated</TableCell>
-                <TableCell>Location</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {vehicles.map((vehicle, idx) => (
-                <TableRow key={idx}>
-                  <TableCell onClick={() => handleActiveVehicleId(vehicle.id)}>
-                    {vehicle.vehicleNumber || "-"}
-                  </TableCell>
-                  <TableCell>{vehicle.driverName || "-"}</TableCell>
-                  <TableCell>{vehicle.status || "-"}</TableCell>
-                  <TableCell>{`${vehicle.speed ?? 0}mph`}</TableCell>
-                  <TableCell>{vehicle.destination || "-"}</TableCell>
-                  <TableCell>{vehicle.estimatedArrival || "-"}</TableCell>
-                  <TableCell>{vehicle.lastUpdated || "-"}</TableCell>
-                  <TableCell>{`${vehicle.currentLocation.lat}-${vehicle.currentLocation.lng}`}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {isLoading ? (
+          <h1>Loader....</h1>
+        ) : (
+          <>
+            <div className="right-header">
+              <h3>Vehicles {`(${vehicles.length})`}</h3>
+              <Button>Live</Button>
+            </div>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Vehicle</TableCell>
+                    <TableCell>Driver</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Speed</TableCell>
+                    <TableCell>Destination</TableCell>
+                    <TableCell>ETA</TableCell>
+                    <TableCell>Last Updated</TableCell>
+                    <TableCell>Location</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {vehicles.map((vehicle, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell
+                        onClick={() => handleActiveVehicleId(vehicle.id)}
+                      >
+                        <p className="vehicles-item-button">
+                          {vehicle.vehicleNumber || "-"}
+                        </p>
+                      </TableCell>
+                      <TableCell>{vehicle.driverName || "-"}</TableCell>
+                      <TableCell>
+                        <p
+                          className={`status-badge-container ${vehicle.status}`}
+                        >
+                          {" "}
+                          {vehicle.status || "-"}
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <p className="speed-badge-container">
+                          {" "}
+                          {`${vehicle.speed ?? 0}mph`}
+                        </p>
+                      </TableCell>
+                      <TableCell>{vehicle.destination || "-"}</TableCell>
+                      <TableCell>{vehicle.estimatedArrival || "-"}</TableCell>
+                      <TableCell>
+                        {formatDateTime(vehicle.lastUpdated)}
+                      </TableCell>
+                      <TableCell>{`${formatLatLng(
+                        vehicle.currentLocation.lat
+                      )},${formatLatLng(
+                        vehicle.currentLocation.lng
+                      )}`}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
+        )}
       </div>
 
       {activeVehicleId && (

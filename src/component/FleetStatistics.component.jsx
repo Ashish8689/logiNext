@@ -1,4 +1,6 @@
+import { Grid } from "@mui/material";
 import { useMemo } from "react";
+import { formatTimestampHourMinute } from "../utils/commom";
 
 const FleetStatistics = ({ statistics }) => {
   const { total, timestamp, average_speed } = statistics;
@@ -18,7 +20,7 @@ const FleetStatistics = ({ statistics }) => {
       },
       {
         title: "Last Updated",
-        count: timestamp,
+        count: formatTimestampHourMinute(timestamp),
       },
     ],
     [average_speed, timestamp, total]
@@ -26,14 +28,20 @@ const FleetStatistics = ({ statistics }) => {
 
   return (
     <div className="fleet-statistics-container">
-      {STATISTICS_OPTIONS.map((item) => {
-        return (
-          <div className="fleet-statistics-item">
-            <h6>{item.count}</h6>
-            <h4>{item.title}</h4>
-          </div>
-        );
-      })}
+      <h3>Fleet Statistics</h3>
+
+      <Grid container spacing={2}>
+        {STATISTICS_OPTIONS.map(({ title, count }) => {
+          return (
+            <Grid size={6} key={title}>
+              <div className="fleet-statistics-item">
+                <h4>{count}</h4>
+                <h6>{title}</h6>
+              </div>
+            </Grid>
+          );
+        })}
+      </Grid>
     </div>
   );
 };

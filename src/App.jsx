@@ -3,28 +3,15 @@ import "./App.css";
 import {
   BASE_URL,
   STATUS_FILTER,
-  TABLE_COLUMNS,
   WEBSOCKET_URL,
 } from "./constant/common.constant";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  CircularProgress,
-} from "@mui/material";
-import VehiclesModal from "./component/VehiclesModal.component";
+import { Button, CircularProgress } from "@mui/material";
 import FleetTrackerLeftPanel from "./component/FleetTrackerLeftPanel.component";
-import { formatDateTime, formatLatLng } from "./utils/commom";
+import FleetTable from "./component/FleetTable.component";
 
 function App() {
   const [vehicles, setVehicles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeVehicleId, setActiveVehicleId] = useState(null);
   const [activeFilter, setActiveFilter] = useState(STATUS_FILTER.ALL);
 
   const fetchVehicles = useCallback(async () => {
@@ -43,14 +30,6 @@ function App() {
       setIsLoading(false);
     }
   }, [activeFilter]);
-
-  const handleActiveVehicleId = (id) => {
-    setActiveVehicleId(id);
-  };
-
-  const handleCloseModal = () => {
-    setActiveVehicleId(null);
-  };
 
   const onFilterChange = useCallback((key) => {
     setActiveFilter(key);
@@ -102,7 +81,7 @@ function App() {
       <div className="right-container">
         {isLoading ? (
           <div className="loader">
-  <CircularProgress />
+            <CircularProgress />
           </div>
         ) : (
           <>
@@ -110,60 +89,10 @@ function App() {
               <h3>Vehicles {`(${vehicles.length})`}</h3>
               <Button>Live</Button>
             </div>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {TABLE_COLUMNS.map((item) => (
-                      <TableCell key={item}>{item}</TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {vehicles.map((vehicle, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell
-                        onClick={() => handleActiveVehicleId(vehicle.id)}
-                      >
-                        <p className="vehicles-item-button">
-                          {vehicle.vehicleNumber || "-"}
-                        </p>
-                      </TableCell>
-                      <TableCell>{vehicle.driverName || "-"}</TableCell>
-                      <TableCell>
-                        <p
-                          className={`status-badge-container ${vehicle.status}`}
-                        >
-                          {vehicle.status || "-"}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <p className="speed-badge-container">
-                          {`${vehicle.speed ?? 0}mph`}
-                        </p>
-                      </TableCell>
-                      <TableCell>{vehicle.destination || "-"}</TableCell>
-                      <TableCell>{vehicle.estimatedArrival || "-"}</TableCell>
-                      <TableCell>
-                        {formatDateTime(vehicle.lastUpdated)}
-                      </TableCell>
-                      <TableCell>{`${formatLatLng(
-                        vehicle.currentLocation.lat
-                      )},${formatLatLng(
-                        vehicle.currentLocation.lng
-                      )}`}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            <FleetTable data={vehicles} />
           </>
         )}
       </div>
-
-      {activeVehicleId && (
-        <VehiclesModal id={activeVehicleId} onClose={handleCloseModal} />
-      )}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BASE_URL } from "../constant/common.constant";
 import "../modal.css";
 import { formatDateTime, formatLatLng } from "../utils/commom";
@@ -41,7 +41,7 @@ const VehiclesModal = ({ id, onClose }) => {
   const [vehicle, setVehicle] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchVehicle = async () => {
+  const fetchVehicle = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await fetch(`${BASE_URL}api/vehicles/${id}`);
@@ -52,11 +52,11 @@ const VehiclesModal = ({ id, onClose }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchVehicle();
-  }, []);
+  }, [fetchVehicle]);
 
   return (
     <Modal
@@ -68,7 +68,7 @@ const VehiclesModal = ({ id, onClose }) => {
       <Box sx={style}>
         {isLoading ? (
           <div className="loader">
-  <CircularProgress />
+            <CircularProgress />
           </div>
         ) : (
           <>
@@ -79,7 +79,9 @@ const VehiclesModal = ({ id, onClose }) => {
                   <h1>{vehicle.vehicleNumber}</h1>
                   <div>
                     {" "}
-                    <h6>{vehicle.driverName} : <span>{vehicle.status}</span></h6>
+                    <h6>
+                      {vehicle.driverName} : <span>{vehicle.status}</span>
+                    </h6>
                   </div>
                 </Typography>
               </div>
@@ -92,7 +94,9 @@ const VehiclesModal = ({ id, onClose }) => {
             <Grid container spacing={2} className="modal-content">
               <Grid size={6} className="modal-item-container">
                 <h3>Status</h3>
-                <p className={`status-badge-container modal-status ${vehicle.status}`}>
+                <p
+                  className={`status-badge-container modal-status ${vehicle.status}`}
+                >
                   {vehicle.status}
                 </p>
               </Grid>
